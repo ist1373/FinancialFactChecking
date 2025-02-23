@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from src.schemas.document import InitDocument, DocumentUUID
 from src.core.security import get_current_user
 from src.llm.charli_llm_client import CharliLLMClient,get_llm_client
-from src.services.document import create_document,generate_document_title,document_claim_extraction,document_claim_evaluation,get_document_by_uuid
+from src.services.document import create_document,generate_document_title,document_claim_extraction,document_claim_evaluation,get_document_by_uuid,get_document_list
 from src.db.session import get_db
 import asyncio
 import json
@@ -31,6 +31,22 @@ async def extract_claims(doc: DocumentUUID,current_user: User = Depends(get_curr
     # document_title = generate_document_title(document_content=document.document_content,llm_client=llm_client)
     claims = await document_claim_extraction(db,doc.uuid)
     return claims
+
+@router.get("/document/get-all")
+async def get_all_documents(current_user: User = Depends(get_current_user), 
+                    db: Session = Depends(get_db)):
+    documents = await get_document_list(db,current_user)
+    return documents
+
+@router.get("/document/{document_uuid}")
+async def get_document_details(document_uuid: str, 
+                               current_user: User = Depends(get_current_user), 
+                               db: Session = Depends(get_db)):
+    """Retrieve details of a document by UUID."""
+    document = get_document_by_uuid(db, document_uuid)
+    if not document:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return document
 
 @router.post("/document/verify-claims")
 async def verify_claims(doc: DocumentUUID,current_user: User = Depends(get_current_user), 
