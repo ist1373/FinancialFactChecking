@@ -1,0 +1,1 @@
+docker volume create fact-checker-mysql-data

@@ -1,0 +1,11 @@
+{
+    "pylint.args": [
+      "--disable=C0115,C0116,W0718,W0707,W0621,W0401,W0614","E0401"
+    ],
+    "python.analysis.extraPaths": [
+      "./src",  // Replace with the directory containing your modules
+  ],
+  "python.autoComplete.extraPaths": [
+    "${workspaceFolder}/src"
+]
+  }

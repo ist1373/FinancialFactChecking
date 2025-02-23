@@ -1,0 +1,1 @@
+docker build --no-cache -t fact-checker-backend-image ../../backend

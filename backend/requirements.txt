@@ -1,0 +1,10 @@
+fastapi[all] 
+sqlalchemy 
+bcrypt 
+python-jose[cryptography] 
+fastapi-users[sqlalchemy]
+pydantic-settings
+psycopg2-binary
+pymysql
+requests==2.32.3
+urllib3==2.3.0
