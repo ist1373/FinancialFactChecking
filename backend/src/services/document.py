@@ -26,9 +26,9 @@ async def generate_document_title(db: Session, document_uuid: str,llm_client:Cha
     
     if not document:
         return None  # Document not found
-    
+    content = document.document_content
     if len(document.document_content) > 100:
-        content = document.document_content
+        content = document.document_content[:100]
     user_prompt = f"DOCUMENT:\n{content}"
     payload = llm_client.format_input(system_prompt=system_prompt,user_prompt=user_prompt)
     generated_title = llm_client.call(payload)

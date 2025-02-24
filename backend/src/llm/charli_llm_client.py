@@ -36,7 +36,6 @@ class CharliLLMClient:
             try:
                 endpoint = urllib.parse.urljoin(self.host_url, self.host_endpoint)
                 result = requests.post(endpoint, json=payload)
-                # check status if request/ raise exceptions
                 result.raise_for_status()
                 results = result.json()["text_output"]
                 return results
