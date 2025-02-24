@@ -29,8 +29,16 @@ async def extract_claims(doc: DocumentUUID,current_user: User = Depends(get_curr
                     db: Session = Depends(get_db)):
 
     # document_title = generate_document_title(document_content=document.document_content,llm_client=llm_client)
-    claims = await document_claim_extraction(db,doc.uuid)
-    return claims
+    document = await document_claim_extraction(db,doc.uuid)
+    return document
+
+@router.post("/document/generate-title")
+async def generate_title(doc: DocumentUUID,current_user: User = Depends(get_current_user), llm_client: CharliLLMClient = Depends(get_llm_client),
+                    db: Session = Depends(get_db)):
+
+    # document_title = generate_document_title(document_content=document.document_content,llm_client=llm_client)
+    document = await generate_document_title(db,doc.uuid, llm_client=llm_client)
+    return document
 
 @router.get("/document/get-all")
 async def get_all_documents(current_user: User = Depends(get_current_user), 
