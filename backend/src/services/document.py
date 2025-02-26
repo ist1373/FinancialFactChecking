@@ -9,6 +9,7 @@ import requests
 import urllib
 from src.core.config import settings
 from src.db.models import DocumentStatus
+import re 
 
 async def generate_document_title(db: Session, document_uuid: str,llm_client:CharliLLMClient)->Optional[Document]:
     system_prompt ="""
@@ -53,7 +54,7 @@ async def document_claim_extraction(db: Session, document_uuid: str)->Optional[D
     
     if response.status_code == 200:
         extracted_claims = response.json()["results"]
-        
+        extracted_claims = [re.sub(r"Item \d+: ", "", s) for s in extracted_claims]
         document.claims = extracted_claims
         document.status = DocumentStatus.CLAIM_VERIFICATION  
         db.commit()

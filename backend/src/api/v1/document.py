@@ -19,8 +19,8 @@ async def init_document(document: InitDocument,current_user: User = Depends(get_
 
     # document_title = generate_document_title(document_content=document.document_content,llm_client=llm_client)
     document = create_document(
-                             document_content=document.document_content,
-                             ground_truth=document.ground_truth,
+                             document_content=document.document_content.replace("\\n", "\n"),
+                             ground_truth=document.ground_truth.replace("\\n", "\n"),
                              current_user=current_user,db=db)
     return document
 
