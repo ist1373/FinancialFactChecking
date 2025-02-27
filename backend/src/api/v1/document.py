@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from src.schemas.document import InitDocument, DocumentUUID
 from src.core.security import get_current_user
 from src.llm.charli_llm_client import CharliLLMClient,get_llm_client
-from src.services.document import create_document,generate_document_title,document_claim_extraction,document_claim_evaluation,get_document_by_uuid,get_document_list
+from src.services.document import create_document,generate_document_title,document_claim_extraction,document_claim_evaluation,get_document_by_uuid,get_document_list,delete_document
 from src.db.session import get_db
 import asyncio
 import json
@@ -44,7 +44,9 @@ async def generate_title(doc: DocumentUUID,current_user: User = Depends(get_curr
 async def get_all_documents(current_user: User = Depends(get_current_user), 
                     db: Session = Depends(get_db)):
     documents = await get_document_list(db,current_user)
-    return documents
+    sorted_documents = sorted(documents, key=lambda doc: doc['creation_date'], reverse=True)
+    return sorted_documents
+
 
 @router.get("/document/{document_uuid}")
 async def get_document_details(document_uuid: str, 
@@ -63,6 +65,16 @@ async def verify_claims(doc: DocumentUUID,current_user: User = Depends(get_curre
     # document_title = generate_document_title(document_content=document.document_content,llm_client=llm_client)
     claims = await document_claim_evaluation(db,doc.uuid)
     return claims
+
+@router.delete("/document/{document_uuid}")
+async def delete_document_by_uuid(document_uuid: str, 
+                                  current_user: User = Depends(get_current_user), 
+                                  db: Session = Depends(get_db)):
+    """Delete a document by UUID."""
+    success = delete_document(db, document_uuid)
+    if not success:
+        raise HTTPException(status_code=404, detail="Document not found or could not be deleted")
+    return {"message": "Document deleted successfully"}
 
 
 active_connections = {}

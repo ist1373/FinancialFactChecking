@@ -99,6 +99,20 @@ def create_document(document_content:str, ground_truth:str ,current_user:User, d
     db.refresh(document)
     return document
 
+def delete_document(db: Session, document_uuid: str) -> bool:
+    """Delete a document by UUID."""
+    try:
+        document = db.query(Document).filter(Document.uuid == document_uuid).first()
+        
+        if not document:
+            return False  # Document not found
+        
+        db.delete(document)
+        db.commit()
+        return True
+    except Exception as e:
+        db.rollback()
+        return False
 
 def update_document(db: Session, document_id: str, update_data: DocumentUpdate) -> Optional[Document]:
     """Update a document's fields such as summary, status, etc."""
@@ -126,6 +140,5 @@ def get_document_by_uuid(db: Session, document_uuid: str) -> Optional[Document]:
 
 async def get_document_list(db: Session, user: User):
     """Retrieve all documents uploaded by a specific user."""
-
-    documents = db.query(Document.uuid, Document.document_title).filter(Document.user_uuid == user.uuid).all()
-    return [{"document_id": str(doc.uuid), "title": doc.document_title} for doc in documents]
+    documents = db.query(Document.uuid, Document.document_title,Document.creation_date).filter(Document.user_uuid == user.uuid).all()
+    return [{"document_id": str(doc.uuid), "title": doc.document_title, "creation_date":doc.creation_date} for doc in documents]
